@@ -48,6 +48,10 @@ def auth():
 def ss1():
     return render_template('server_time.html', server_time= str(datetime.datetime.now()) )
 
+@app.route('/earth') #endpoint
+def earth():
+        return render_template('client_time.html')
+
 @app.route('/getTime') #endpoint
 def get_time():
     return json_response(data={"password" : request.args.get('password'),

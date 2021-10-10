@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- head definitions go here -->
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    </head>
+    <body style="background-image: url('/static/space.jpg'); background-size: cover; background-repeat: no-repeat">
+	    <div>
+		    <center><img src='/static/earth.gif'></center>
+		    <center> <h1> We only have one earth, take care of it!</center>
+	    </div>
+	<script>
+		function dropDownList() {
+			var mylist = document.getElementById("myList");
+			document.getElementById("dropDown").value = mylist.options[mylist.selectedIndex].text;
+		}
+	</script>
+	<center><form><center>
+		<b> Alternatives to Earth </b>
+		<select id = "myList" onchange = "dropDown()" >
+			<option> ---Choose Alternative--- </option>
+			<option> None </option>
+		</select>
+		<p> Your selected option is: Taking care of Earth! :)
+	</form>
+    </body>
+</html>
