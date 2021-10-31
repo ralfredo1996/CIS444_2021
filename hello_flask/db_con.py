@@ -1,8 +1,8 @@
 import psycopg2
-
+import bcrypt
 
 def get_db():
-    return psycopg2.connect(host="localhost", dbname="authme" , user="loki", password="4prez")
+    return psycopg2.connect(host="localhost", dbname="books" , user="superuser", password="Thanosdidnothingwrong1!")
 
 def get_db_instance():  
     db  = get_db()
@@ -15,13 +15,18 @@ def get_db_instance():
 if __name__ == "__main__":
     db, cur = get_db_instance()
 
-    cur.execute("select * from users")
-    for r in cur.fetchall():
-        print(r)
-
-    cur.execute("create table music ( song_name varchar(255), rating int);")
+    pw = "myspace"
+    salted = bcrypt.hashpw(bytes(pw, 'utf-8'),  bcrypt.gensalt(12))
+    print(salted)
+    sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
+    
+    val = ("Tom", salted.decode('ascii'))
+    print(type(salted))
+    cur.execute(sql, val)
     db.commit()
 
-
+    #cur.execute("select * from users")
+    #for r in cur.fetchall():
+        #print(r)
 
 

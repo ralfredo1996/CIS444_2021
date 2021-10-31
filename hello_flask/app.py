@@ -47,18 +47,28 @@ def back():
 @app.route('/backp',  methods=['POST']) #endpoint
 def backp():
     print(request.form)
-    salted = bcrypt.hashpw( bytes(request.form['fname'],  'utf-8' ) , bcrypt.gensalt(10))
+    salted = bcrypt.hashpw( bytes(request.form['pw'],  'utf-8' ) , bcrypt.gensalt(10))
     print(salted)
 
-    print(  bcrypt.checkpw(  bytes(request.form['fname'],  'utf-8' )  , salted ))
+    print(  bcrypt.checkpw(  bytes(request.form['pw'],  'utf-8' )  , salted ))
 
     return render_template('backatu.html',input_from_browser= str(request.form) )
 
 @app.route('/auth',  methods=['POST']) #endpoint
 def auth():
-        print(request.form)
-        return json_response(data=request.form)
+        username = request.form['username']
+        password = request.form['password']
 
+        cur = global_db_con.cursor()
+        cur.execute("select password from users where username = %s", (username,))
+        row = cur.fetchone()
+        db_pw = row[0].encode('ascii')
+         
+        compare = bcrypt.checkpw(bytes(request.form['password'], 'utf-8'), db_pw)
+
+        print(compare)
+
+        return render_template('first_form.html',input_from_browser= str(request.form) )
 
 
 #Assigment 2
