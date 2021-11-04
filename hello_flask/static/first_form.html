@@ -6,42 +6,97 @@
     <body>
 
 	<script>
+		let jwt; 
+		function show_books(){
+                        
+                        $('#login').hide();
+                        $('#books').show();
+			$('#buy').show();
+			$('#signup').hide();
+
+			$.getJSON( "http://3.135.229.55/books", {jwt: jwt} , function( json ) {
+                                const bookArray = json.bookArray;
+                                for(let i = 0; i < bookArray.length; i++){
+                                        id = bookArray[i][0];
+                                        name = bookArray[i][1];
+                                        price = bookArray[i][2];
+
+                                        $('#bookList').append('<option value="' + id + '"> ' + name + " - " + price + '</option>');
+                                }
+                                        
+                        });
+                }
+
 		function check_form(){
-
-			alert($('#username').val());
-			alert($('#password').val());
-
-			$('#login').hide();
-			$('#books').show();
 			
-			$('#cars').append('<option value="volvo">Thank you Taco</option>')
+			const userInfo = {username: $('#username').val(), password: $('#password').val()}
+		
+			$.post("http://3.135.229.55/auth", userInfo, function(json) {
+				
+				jwt = json.jwt;
+				console.log(json.jwt);
+                                show_books();
+                                
+			})
 
+			.fail(function(error){
 
-			return false;
-
-			if($('#fname').val().length == 0){
+				alert("Incorrect Info");
 				return false;
-			}else{
-				return true;
-			}
+					
+			});
+			
+		}
+		
+		function buy_book(){
+			values = {username: $('#username').val(),jwt:jwt, bookID: $('#bookList').val()}
+			$.post("http://3.135.229.55/buyBook", values, function(json)
+				{
+					console.log(values);
+					alert("Purchase Successful");
+				})
+		};
+		
+		function createUser(){
+			const userInfo = {username: $('#newUsername').val(), password: $('#newPassword').val()}
+			$.post("http://3.135.229.55/createUser", userInfo, function(json)
+				{
+					console.log(userInfo);
+					alert("User Created");
+				})
 		}
 
 	</script>
             <div id="login">
-	    	<form action="/auth" method="post">
-  			<label for="username">Username:</label><br>
+		<h1>Login</h1>
+	    	<form onsubmit="return false">
+			<label for="username">Username:</label><br>
   				<input type="text" id="username" name="username" value=""><br>
   			<label for="password">Password:</label><br>
   				<input type="password" id="password" name="password" value=""><br><br>
-  			<input type="submit" value="Signup" onclick="return check_form();">
+  			<input type="submit" value="Login" onclick="return check_form();">
 		</form>
 	    </div>
 
-	    <div id="books" style="display:none">
-		    <h1>Buy me</h1>
-		    <select name="cars" id="cars">
+	    <br>
 
-  		    </select>
+	<div id="signup">
+		<h1>Signup!</h1>
+                <form onsubmit="return false">
+                        <label for="username">Username:</label><br>
+                                <input type="text" id="newUsername" name="username" value=""><br>
+                        <label for="password">Password:</label><br>
+                                <input type="password" id="newPassword" name="password" value=""><br><br>
+                        <input type="submit" value="Signup" onclick="return createUser();">
+                </form>
+            </div>
+
+	    <div id="books" style="display:none">
+		    <h1>Available Books</h1>
+		    <select name="books" id="bookList">
+		    </select>
+		    <br>
+		    <input type="submit" value="Purchase" onclick="return buy_book();">
 	    </div>
 
     </body>

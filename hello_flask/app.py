@@ -20,7 +20,7 @@ IMGS_URL = {
             }
 
 CUR_ENV = "PRD"
-JWT_SECRET = None
+JWT_SECRET = "BAD PRACTICE BUt IM RUNNING OUT OF TIME"
 
 global_db_con = get_db()
 
@@ -31,10 +31,6 @@ with open("secret", "r") as f:
 @app.route('/') #endpoint
 def index():
     return 'Web App with Python Caprice!' + USER_PASSWORDS['cjardin']
-
-@app.route('/buy') #endpoint
-def buy():
-    return 'Buy'
 
 @app.route('/hello') #endpoint
 def hello():
@@ -60,16 +56,77 @@ def auth():
         password = request.form['password']
 
         cur = global_db_con.cursor()
-        cur.execute("select password from users where username = %s", (username,))
-        row = cur.fetchone()
-        db_pw = row[0].encode('ascii')
+        try:
+            cur.execute("select password from users where username = %s", (username,))
+            row = cur.fetchone()
+            db_pw = row[0].encode('ascii')
          
-        compare = bcrypt.checkpw(bytes(request.form['password'], 'utf-8'), db_pw)
+            compare = bcrypt.checkpw(bytes(request.form['password'], 'utf-8'), db_pw)
 
-        print(compare)
+            print(compare)
+        
+            if compare == True:
+                jwt_str = jwt.encode({"username" : username} , JWT_SECRET, algorithm="HS256")
+                return json_response(jwt=jwt_str)
+            else:
+                return "Record not found", 400
+        except:
+            return "Record not found", 403
 
-        return render_template('first_form.html',input_from_browser= str(request.form) )
+@app.route('/buyBook',  methods=['POST']) #endpoint
+def buyBook():
+    try:
+        data = request.form['jwt']
+        jwt.decode(data, JWT_SECRET, algorithms=["HS256"])
+    except:
+        return "Not allowed" , 403
+    username = request.form['username']
+    print(username)
+    bID = request.form['bookID']
+    print(bID)
+    cur = global_db_con.cursor()
+    cur.execute("select name from books where id = %s", (bID,))
+    bookname = cur.fetchone()
+    print(bookname)
+    cur.execute("insert into purchases (userID, bookID) values (%s, %s)", (username, bookname))
+    global_db_con.commit();
+    return "Good"
+    
 
+@app.route('/books', methods=['GET'])
+def books():
+
+    try:
+        data = request.args
+        token = data["jwt"]
+        jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+    except:
+        return "Not allowed" , 403
+    cur = global_db_con.cursor()
+    cur.execute("select id, name, price from books;")
+    books = cur.fetchall()
+    bookArray = []
+    for i in books:
+        bookArray.append(i)
+    return json_response(bookArray=books)
+
+@app.route('/createUser',  methods=['POST']) #endpoint
+def createUser():
+    username = request.form['username']
+    print(username)
+    password = request.form['password']
+    print(password)
+    
+    cur = global_db_con.cursor()
+    salted = bcrypt.hashpw(bytes(password, 'utf-8'), bcrypt.gensalt(12))
+
+    sql = "INSERT INTO users (username, password) VALUES (%s, %s)"
+    val = (username, salted.decode('ascii'))
+
+    cur.execute(sql, val)
+    global_db_con.commit();
+
+    return "Good"
 
 #Assigment 2
 @app.route('/ss1') #endpoint
