@@ -11,13 +11,11 @@ import traceback
 from db_con import get_db_instance, get_db
 
 from tools.token_required import token_required
-
+from tools.get_aws_secrets import get_secrets
 
 from tools.logging import logger
 
 ERROR_MSG = "Ooops.. Didn't work!"
-
-DEBUG = True
 
 
 #Create our app
@@ -30,12 +28,7 @@ def init_new_env():
     if 'db' not in g:
         g.db = get_db()
 
-    if DEBUG == False:
-        from tools.get_aws_secrets import get_secrets
-        if 'secrets' not in g:
-            g.secrets = get_secrets()
-    else:
-            g.secrets = {"JWT": "KxQ(S#@>\"5=m$#58SgzD,+H+a73*pzKH,g5_"}
+    g.secrets = get_secrets()
 
 #This gets executed by default by the browser if no page is specified
 #So.. we redirect to the endpoint we want to load the base page
