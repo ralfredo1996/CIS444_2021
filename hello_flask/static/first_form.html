@@ -14,7 +14,7 @@
 			$('#buy').show();
 			$('#signup').hide();
 
-			$.getJSON( "http://3.135.229.55/books", {jwt: jwt} , function( json ) {
+			$.getJSON( "/books", {jwt: jwt} , function( json ) {
                                 const bookArray = json.bookArray;
                                 for(let i = 0; i < bookArray.length; i++){
                                         id = bookArray[i][0];
@@ -31,7 +31,7 @@
 			
 			const userInfo = {username: $('#username').val(), password: $('#password').val()}
 		
-			$.post("http://3.135.229.55/auth", userInfo, function(json) {
+			$.post("/auth", userInfo, function(json) {
 				
 				jwt = json.jwt;
 				console.log(json.jwt);
@@ -50,7 +50,7 @@
 		
 		function buy_book(){
 			values = {username: $('#username').val(),jwt:jwt, bookID: $('#bookList').val()}
-			$.post("http://3.135.229.55/buyBook", values, function(json)
+			$.post("/buyBook", values, function(json)
 				{
 					console.log(values);
 					alert("Purchase Successful");
@@ -59,7 +59,7 @@
 		
 		function createUser(){
 			const userInfo = {username: $('#newUsername').val(), password: $('#newPassword').val()}
-			$.post("http://3.135.229.55/createUser", userInfo, function(json)
+			$.post("/createUser", userInfo, function(json)
 				{
 					console.log(userInfo);
 					alert("User Created");
